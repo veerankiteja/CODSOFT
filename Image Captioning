@@ -1,0 +1,72 @@
+import tensorflow as tf
+from tensorflow.keras.preprocessing import image
+from tensorflow.keras.applications.resnet50 import preprocess_input
+from tensorflow.keras.applications import ResNet50
+from tensorflow.keras.models import Model
+from tensorflow.keras.layers import Input, Dense, Embedding, LSTM
+from tensorflow.keras.preprocessing.text import Tokenizer
+from tensorflow.keras.preprocessing.sequence import pad_sequences
+from nltk.translate.bleu_score import corpus_bleu
+import numpy as np
+from PIL import Image
+import os
+
+# Define your dataset and captions
+captions = [...]  # Replace with your captions
+image_data = [...]  # Replace with your image data
+
+# Load pre-trained ResNet model without top (classification) layer
+base_model = ResNet50(weights='imagenet', include_top=False, input_tensor=Input(shape=(224, 224, 3)))
+
+# Freeze the convolutional layers
+for layer in base_model.layers:
+    layer.trainable = False
+
+import tensorflow as tf
+from tensorflow.keras.preprocessing import image
+from tensorflow.keras.applications.resnet50 import preprocess_input
+from tensorflow.keras.applications import ResNet50
+from tensorflow.keras.models import Model
+from tensorflow.keras.layers import Input, Dense, Embedding, LSTM
+from tensorflow.keras.preprocessing.text import Tokenizer
+from tensorflow.keras.preprocessing.sequence import pad_sequences
+from nltk.translate.bleu_score import corpus_bleu
+import numpy as np
+from PIL import Image
+import os
+
+# Define your dataset and captions
+captions = [...]  # Replace with your captions
+image_data = [...]  # Replace with your image data
+
+# Load pre-trained ResNet model without top (classification) layer
+base_model = ResNet50(weights='imagenet', include_top=False, input_tensor=Input(shape=(224, 224, 3)))
+
+# Freeze the convolutional layers
+for layer in base_model.layers:
+    layer.trainable = False
+
+# Define the image captioning model
+vocab_size = 10000  # Define your vocabulary size
+embedding_dim = 256  # Define your embedding dimension
+max_seq_length = 20  # Define your maximum sequence length
+
+image_input = Input(shape=(224, 224, 3))
+encoded_image = base_model(image_input)
+flatten = tf.keras.layers.Flatten()(encoded_image)
+dense = Dense(256, activation='relu')(flatten)
+
+caption_input = Input(shape=(max_seq_length,))
+embedding_layer = Embedding(vocab_size, embedding_dim, input_length=max_seq_length)(caption_input)
+lstm_layer = LSTM(256)(embedding_layer)
+
+decoder = tf.keras.layers.add([dense, lstm_layer])
+output = Dense(vocab_size, activation='softmax')(decoder)
+
+model = Model(inputs=[image_input, caption_input], outputs=output)
+model.compile(loss='categorical_crossentropy', optimizer='adam')
+
+# Print the model summary
+model.summary()
+
+# Tokenize
